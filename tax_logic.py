@@ -137,4 +137,4 @@ summary_data = {
 }
 
 df = pd.DataFrame(summary_data)
-df.style.format({"Amount (₹)": "₹{:,.0f}"})
+# df.style.format({"Amount (₹)": "₹{:,.0f}"})
