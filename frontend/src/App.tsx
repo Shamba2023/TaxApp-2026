@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IndianRupee, ShieldCheck, ChevronRight, Calculator, PieChart, TrendingDown, Info } from "lucide-react";
+import { IndianRupee, ShieldCheck, ChevronRight, Calculator, PieChart, TrendingDown, Info, Wallet } from "lucide-react";
 
 const TaxCalculatorUI = () => {
   const [formData, setFormData] = useState({
@@ -39,172 +39,133 @@ const TaxCalculatorUI = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-blue-100">
-      {/* Top Decoration Bar */}
-      <div className="h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
-
-      <div className="max-w-6xl mx-auto py-12 px-6">
-        {/* Header */}
-        <header className="mb-12 text-center lg:text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-bold mb-4">
-            <ShieldCheck className="w-4 h-4" /> Finance Act 2025 Compliant
+    <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-4 lg:p-8 font-sans">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[32px] overflow-hidden min-h-[750px]">
+        
+        {/* LEFT PANEL: Deep Professional Command Center */}
+        <div className="lg:w-[42%] bg-[#1E293B] p-8 lg:p-12 text-white flex flex-col">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="bg-blue-600 p-2 rounded-xl">
+              <Calculator className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight">TaxEngine<span className="text-blue-400">2026</span></h1>
           </div>
-          <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">
-            Indian Tax <span className="text-blue-600">Suite</span>
-          </h1>
-          <p className="text-slate-500 mt-3 text-lg max-w-2xl">
-            Precision tax planning for Assessment Year 2026-27.
-          </p>
-        </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          {/* Inputs Section */}
-          <div className="lg:col-span-5 space-y-6">
-            <section className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
-              <h2 className="text-lg font-bold flex items-center gap-2 mb-8 border-b pb-4">
-                <Calculator className="w-5 h-5 text-blue-600" /> Income Details
-              </h2>
-
-              <div className="space-y-5">
-                {[
-                  { id: "gross_salary", label: "Annual Gross Salary", icon: "💼" },
-                  { id: "interest_income", label: "Interest Income", icon: "🏦" },
-                  { id: "rental_income", label: "Rental Income", icon: "🏠" },
-                  { id: "other_income", label: "Other Sources", icon: "✨" },
-                ].map((field) => (
-                  <div key={field.id} className="group">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block group-focus-within:text-blue-600 transition-colors">
-                      {field.label}
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">₹</span>
-                      <input
-                        type="number"
-                        value={formData[field.id]}
-                        onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                        className="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all font-semibold"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                ))}
-
-                <div className="pt-6 mt-6 border-t border-dashed border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="text-xs font-bold text-indigo-500 uppercase tracking-wider">
-                      NPS Corporate (80CCD2)
-                    </label>
-                    <Info className="w-4 h-4 text-slate-300" />
-                  </div>
+          <div className="space-y-6 flex-1">
+            <p className="text-slate-400 text-sm font-medium uppercase tracking-widest mb-4">Income Parameters</p>
+            
+            {[
+              { id: "gross_salary", label: "Annual Salary", icon: "💼" },
+              { id: "interest_income", label: "Investment Interest", icon: "📈" },
+              { id: "rental_income", label: "Rental Earnings", icon: "🏠" },
+              { id: "other_income", label: "Miscellaneous", icon: "✨" },
+            ].map((field) => (
+              <div key={field.id} className="space-y-2">
+                <label className="text-xs font-bold text-slate-400 ml-1 italic">{field.label}</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
                   <input
                     type="number"
-                    value={formData.nps_corporate}
-                    onChange={(e) => setFormData({ ...formData, nps_corporate: e.target.value })}
-                    className="w-full px-4 py-3 bg-indigo-50 border border-indigo-100 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 outline-none transition-all font-semibold text-indigo-700"
-                    placeholder="0"
+                    value={formData[field.id]}
+                    onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+                    className="w-full bg-[#0F172A] border border-slate-700 rounded-2xl py-4 pl-10 pr-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none font-semibold"
                   />
                 </div>
               </div>
+            ))}
 
-              <button
-                onClick={handleCalculate}
-                disabled={loading}
-                className={`w-full mt-10 py-4 rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95 ${
-                  loading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200'
-                }`}
-              >
-                {loading ? "Calculating..." : "Calculate My Tax"} 
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </section>
+            <div className="pt-6 mt-6 border-t border-slate-700/50">
+              <label className="text-xs font-bold text-blue-400 ml-1">NPS CORPORATE (80CCD2)</label>
+              <input
+                type="number"
+                value={formData.nps_corporate}
+                onChange={(e) => setFormData({ ...formData, nps_corporate: e.target.value })}
+                className="w-full bg-[#0F172A] border border-blue-900/30 rounded-2xl py-4 px-6 mt-2 text-white focus:border-blue-500 outline-none font-semibold"
+              />
+            </div>
           </div>
 
-          {/* Results Section */}
-          <div className="lg:col-span-7">
-            {data ? (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                {/* Hero Result */}
-                <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 blur-[100px] rounded-full -mr-20 -mt-20" />
-                  
-                  <div className="relative z-10">
-                    <div className="flex justify-between items-start mb-10">
-                      <div>
-                        <p className="text-slate-400 font-medium uppercase tracking-[0.2em] text-xs">Total Tax Liability</p>
-                        <h3 className="text-6xl lg:text-7xl font-black mt-2 tracking-tighter">
-                          ₹{Math.round(data.results?.total_tax).toLocaleString("en-IN")}
-                        </h3>
-                      </div>
-                      <div className="bg-white/10 backdrop-blur-md p-3 rounded-2xl">
-                        <IndianRupee className="w-8 h-8 text-blue-400" />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-8 border-t border-white/10 pt-8">
-                      <div>
-                        <p className="text-slate-500 text-xs uppercase font-bold tracking-widest mb-1">Taxable Income</p>
-                        <p className="text-xl font-bold">₹{data.summary?.net_taxable.toLocaleString("en-IN")}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500 text-xs uppercase font-bold tracking-widest mb-1">Effective Rate</p>
-                        <p className="text-xl font-bold">
-                          {data.summary?.net_taxable > 0 
-                            ? ((data.results.total_tax / data.summary.net_taxable) * 100).toFixed(1) 
-                            : 0}%
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Breakdown Tiles */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-5">
-                    <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
-                      <TrendingDown className="w-6 h-6 text-orange-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-400 uppercase">Surcharge</p>
-                      <p className="text-xl font-extrabold text-slate-800">₹{Math.round(data.results?.surcharge).toLocaleString("en-IN")}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-5">
-                    <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                      <PieChart className="w-6 h-6 text-blue-500" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-400 uppercase">Cess (4%)</p>
-                      <p className="text-xl font-extrabold text-slate-800">₹{Math.round(data.results?.cess).toLocaleString("en-IN")}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rebate Note */}
-                {data.results.rebate_adjustment > 0 && (
-                  <div className="bg-emerald-50 border border-emerald-100 p-6 rounded-3xl flex gap-4">
-                    <div className="bg-emerald-500 text-white p-1 rounded-full h-fit">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <p className="text-emerald-800 text-sm font-medium leading-relaxed">
-                      <strong>Tax Saved!</strong> You benefitted from ₹{data.results.rebate_adjustment.toLocaleString("en-IN")} in Section 87A Marginal Relief/Rebate.
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="h-full min-h-[400px] bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-[3rem] flex flex-col items-center justify-center text-slate-400 p-8 text-center">
-                <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-6">
-                  <Calculator className="w-10 h-10 text-slate-200" />
-                </div>
-                <h4 className="text-slate-600 font-bold text-lg mb-2">Ready to Calculate?</h4>
-                <p className="max-w-[280px] text-sm leading-relaxed">
-                  Enter your income details and click the button to see your detailed 2026-27 tax report.
-                </p>
-              </div>
-            )}
-          </div>
+          <button
+            onClick={handleCalculate}
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black text-lg mt-10 transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]"
+          >
+            {loading ? "CALCULATING..." : "GENERATE REPORT"}
+          </button>
         </div>
+
+        {/* RIGHT PANEL: Soothing Results Display */}
+        <div className="flex-1 bg-white p-8 lg:p-12 flex flex-col justify-center">
+          {data ? (
+            <div className="animate-in fade-in slide-in-from-right-8 duration-500">
+              <header className="mb-10 text-center lg:text-left">
+                <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter mb-4">
+                  <ShieldCheck className="w-4 h-4" /> Final Assessment AY 2026-27
+                </div>
+                <h2 className="text-4xl font-black text-slate-800 tracking-tight">Tax Report Summary</h2>
+              </header>
+
+              <div className="grid gap-6">
+                {/* Main Tax Card */}
+                <div className="bg-[#F8FAFC] border border-slate-200 p-8 rounded-[28px] relative overflow-hidden group hover:border-blue-200 transition-colors">
+                  <div className="relative z-10">
+                    <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Total Tax Liability</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-light text-slate-400">₹</span>
+                      <h3 className="text-7xl font-black text-slate-900 tracking-tighter">
+                        {Math.round(data.results?.total_tax).toLocaleString("en-IN")}
+                      </h3>
+                    </div>
+                  </div>
+                  <Wallet className="absolute -right-4 -bottom-4 w-32 h-32 text-slate-100 group-hover:text-blue-50 transition-colors" />
+                </div>
+
+                {/* Sub-details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Taxable Income</p>
+                      <p className="text-xl font-extrabold text-slate-700">₹{data.summary?.net_taxable.toLocaleString("en-IN")}</p>
+                    </div>
+                    <PieChart className="w-6 h-6 text-slate-300" />
+                  </div>
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Effective Rate</p>
+                      <p className="text-xl font-extrabold text-slate-700">
+                        {data.summary?.net_taxable > 0 
+                          ? ((data.results.total_tax / data.summary.net_taxable) * 100).toFixed(1) 
+                          : 0}%
+                      </p>
+                    </div>
+                    <TrendingDown className="w-6 h-6 text-slate-300" />
+                  </div>
+                </div>
+
+                {/* Status Bar */}
+                <div className="mt-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-center gap-4">
+                  <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                    <Info className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <p className="text-sm text-slate-600 font-medium">
+                    Calculation includes <span className="text-blue-700 font-bold">Standard Deduction (₹75k)</span> and applicable Section 87A rebates.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center space-y-6">
+              <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-300">
+                <IndianRupee className="w-10 h-10 text-slate-200" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800">Ready for Analysis?</h3>
+              <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">
+                Enter your income data in the left panel to generate your 2026-27 comprehensive tax breakdown.
+              </p>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );
