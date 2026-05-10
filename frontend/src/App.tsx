@@ -48,7 +48,7 @@ const TaxCalculatorUI = () => {
             <div className="bg-blue-600 p-2 rounded-xl">
               <Calculator className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">TaxEngine<span className="text-blue-400">2026</span></h1>
+            <h1 className="text-2xl font-bold tracking-tight">Tax Sage <span className="text-blue-400">2026</span></h1>
           </div>
 
           <div className="space-y-6 flex-1">
