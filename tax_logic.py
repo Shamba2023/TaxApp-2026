@@ -100,41 +100,41 @@ class TaxEngine2026:
         }
     
 
-# --- INPUT SECTION ---
-user_income = IncomeData(gross_salary=14500000, interest_income=15000)
-user_deductions = DeductionsData(nps_corporate_80ccd2=50000)
+# # --- INPUT SECTION ---
+# user_income = IncomeData(gross_salary=14500000, interest_income=15000)
+# user_deductions = DeductionsData(nps_corporate_80ccd2=50000)
 
-# --- PROCESSING ---
-total_gross = user_income.get_total_gross()
-total_deductions = user_deductions.get_total_deductions()
-net_taxable = max(0, total_gross - total_deductions)
+# # --- PROCESSING ---
+# total_gross = user_income.get_total_gross()
+# total_deductions = user_deductions.get_total_deductions()
+# net_taxable = max(0, total_gross - total_deductions)
 
-engine = TaxEngine2026()
-results = engine.compute(net_taxable)
+# engine = TaxEngine2026()
+# results = engine.compute(net_taxable)
 
-# --- BEAUTIFUL OUTPUT ---
-summary_data = {
-    "Description": [
-        "Gross Total Income", 
-        "Total Deductions", 
-        "Net Taxable Income",
-        "Slab Tax (Before Rebate)",
-        "87A Rebate/Relief",
-        "Surcharge",
-        "Health & Education Cess (4%)",
-        "TOTAL TAX PAYABLE"
-    ],
-    "Amount (₹)": [
-        total_gross,
-        -total_deductions,
-        results['taxable_income'],
-        results['base_tax'],
-        -results['rebate_adjustment'],
-        results['surcharge'],
-        results['cess'],
-        results['total_tax']
-    ]
-}
+# # --- BEAUTIFUL OUTPUT ---
+# summary_data = {
+#     "Description": [
+#         "Gross Total Income", 
+#         "Total Deductions", 
+#         "Net Taxable Income",
+#         "Slab Tax (Before Rebate)",
+#         "87A Rebate/Relief",
+#         "Surcharge",
+#         "Health & Education Cess (4%)",
+#         "TOTAL TAX PAYABLE"
+#     ],
+#     "Amount (₹)": [
+#         total_gross,
+#         -total_deductions,
+#         results['taxable_income'],
+#         results['base_tax'],
+#         -results['rebate_adjustment'],
+#         results['surcharge'],
+#         results['cess'],
+#         results['total_tax']
+#     ]
+# }
 
-df = pd.DataFrame(summary_data)
-# df.style.format({"Amount (₹)": "₹{:,.0f}"})
+# df = pd.DataFrame(summary_data)
+# # df.style.format({"Amount (₹)": "₹{:,.0f}"})
