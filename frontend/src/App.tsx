@@ -13,7 +13,7 @@ const TaxCalculatorUI = () => {
   const [data, setData] = useState(null);
 
   const handleCalculate = async () => {
-    const resp = await fetch("/calculate/", {
+    const resp = await fetch("/calculate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
