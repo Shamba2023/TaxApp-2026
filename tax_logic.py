@@ -1,140 +1,124 @@
 from dataclasses import dataclass
-import pandas as pd
+from typing import Dict
 
 @dataclass
-class IncomeData:
+class SalaryIncome:
+    """Head 1: Income from Salary"""
     gross_salary: float = 0.0
-    interest_income: float = 0.0
-    rental_income: float = 0.0
-    other_income: float = 0.0
+    standard_deduction: float = 75000.0  # FY 2026-27 New Regime
+    professional_tax: float = 0.0
 
-    def get_total_gross(self):
-        return self.gross_salary + self.interest_income + self.rental_income + self.other_income
+    def compute(self) -> float:
+        """Subtracts standard deduction and professional tax from gross salary."""
+        return max(0, self.gross_salary - self.standard_deduction - self.professional_tax)
 
 @dataclass
-class DeductionsData:
-    standard_deduction: float = 75000.0
-    nps_corporate_80ccd2: float = 0.0
-    
-    def get_total_deductions(self):
-        return self.standard_deduction + self.nps_corporate_80ccd2
-    
+class HousePropertyIncome:
+    """Head 2: Income from House Property"""
+    rental_income: float = 0.0
+    municipal_taxes: float = 0.0
+    interest_on_loan: float = 0.0  # Self-occupied or Let-out interest
+
+    def compute(self) -> float:
+        """
+        Calculates Net Annual Value (NAV) and applies 30% Standard Deduction.
+        Formula: (Rental Income - Municipal Taxes) * 70% - Interest on Loan.
+        """
+        nav = max(0, self.rental_income - self.municipal_taxes)
+        standard_deduction = nav * 0.30
+        return nav - standard_deduction - self.interest_on_loan
+
+@dataclass
+class BusinessProfessionIncome:
+    """Head 3: Income from Business or Profession"""
+    net_profit: float = 0.0
+    presumptive_income: float = 0.0
+
+    def compute(self) -> float:
+        return self.net_profit + self.presumptive_income
+
+@dataclass
+class CapitalGainsIncome:
+    """Head 4: Income from Capital Gains"""
+    stcg_taxable: float = 0.0
+    ltcg_taxable: float = 0.0
+
+    def compute(self) -> float:
+        # Note: Future updates can handle special tax rates (12.5%, 20%, etc.) here.
+        return self.stcg_taxable + self.ltcg_taxable
+
+@dataclass
+class OtherSourcesIncome:
+    """Head 5: Income from Other Sources"""
+    interest_income: float = 0.0
+    dividends: float = 0.0
+    other_earnings: float = 0.0
+
+    def compute(self) -> float:
+        return self.interest_income + self.dividends + self.other_earnings
 
 class TaxEngine2026:
     def __init__(self):
+        # New Regime Slabs (Finance Act 2025)
+        self.slabs = [
+            (400000, 0.05),   # 4L - 8L
+            (800000, 0.10),   # 8L - 12L
+            (1200000, 0.15),  # 12L - 16L
+            (1600000, 0.20),  # 16L - 20L
+            (2000000, 0.25),  # 20L - 24L
+            (2400000, 0.30),  # Above 24L
+        ]
         self.REBATE_THRESHOLD = 1200000
         self.CESS_RATE = 0.04
-        self.SLABS = [
-            (400000, 0.00), (800000, 0.05), (1200000, 0.10),
-            (1600000, 0.15), (2000000, 0.20), (2400000, 0.25),
-            (float('inf'), 0.30)
-        ]
 
-    def _calculate_slab_tax(self, income):
-        tax, prev_limit = 0, 0
-        for limit, rate in self.SLABS:
-            if income > prev_limit:
-                taxable_amount = min(income, limit) - prev_limit
-                tax += taxable_amount * rate
-                prev_limit = limit
-            else: break
-        return tax
-
-    def _calculate_surcharge(self, income, tax_before_surcharge):
-        """Calculates surcharge with marginal relief for high income thresholds."""
-        # Surcharge rates for New Regime (Finance Act 2025)
-        if income > 20000000: rate, threshold = 0.25, 20000000
-        elif income > 10000000: rate, threshold = 0.15, 10000000
-        elif income > 5000000: rate, threshold = 0.10, 5000000
-        else: return 0.0, 0.0
+    def compute_tax(self, gross_total_income: float, nps_80ccd2: float = 0) -> Dict:
+        # Final Net Taxable Income after 80CCD2 (Corporate NPS)
+        net_taxable = max(0, gross_total_income - nps_80ccd2)
         
-        current_surcharge = tax_before_surcharge * rate
+        # Calculate Base Tax
+        base_tax = self._calculate_slab_tax(net_taxable)
         
-        # --- Marginal Relief Logic for Surcharge ---
-        # Rule: Tax + Surcharge cannot exceed (Tax at threshold + Surcharge at threshold) + (Income - Threshold)
+        # Apply 87A Rebate / Marginal Relief
+        tax_after_rebate = self._apply_rebate(net_taxable, base_tax)
         
-        tax_at_threshold = self._calculate_slab_tax(threshold)
-        # Calculate surcharge specifically for the threshold limit to compare
-        if threshold == 20000000: threshold_surcharge = tax_at_threshold * 0.15
-        elif threshold == 10000000: threshold_surcharge = tax_at_threshold * 0.10
-        else: threshold_surcharge = 0 # No surcharge at 50L exactly
-            
-        max_total_tax_allowed = (tax_at_threshold + threshold_surcharge) + (income - threshold)
-        current_total_tax = tax_before_surcharge + current_surcharge
+        # Surcharge (Simplified for New Regime)
+        surcharge, s_rate = self._calculate_surcharge(net_taxable, tax_after_rebate)
         
-        if current_total_tax > max_total_tax_allowed:
-            # If we are over the limit, the surcharge is adjusted
-            # so that (Tax + Adjusted Surcharge) == max_total_tax_allowed
-            refined_surcharge = max(0, max_total_tax_allowed - tax_before_surcharge)
-            return refined_surcharge, rate
-            
-        return current_surcharge, rate
-
-    def compute(self, taxable_income):
-        # 1. Base Slab Tax
-        base_tax = self._calculate_slab_tax(taxable_income)
-        
-        # 2. 87A Rebate / Marginal Relief (for 12L threshold)
-        tax_after_rebate = base_tax
-        if taxable_income <= self.REBATE_THRESHOLD:
-            tax_after_rebate = 0
-        else:
-            excess = taxable_income - self.REBATE_THRESHOLD
-            if base_tax > excess:
-                tax_after_rebate = excess
-        
-        # 3. Surcharge with corrected logic
-        surcharge, s_rate = self._calculate_surcharge(taxable_income, tax_after_rebate)
-        
-        # 4. Cess
-        cess = (tax_after_rebate + surcharge) * self.CESS_RATE
+        # Education Cess
+        final_tax_before_cess = tax_after_rebate + surcharge
+        cess = final_tax_before_cess * self.CESS_RATE
         
         return {
-            "taxable_income": taxable_income,
+            "total_tax": final_tax_before_cess + cess,
             "base_tax": base_tax,
-            "rebate_adjustment": base_tax - tax_after_rebate,
             "surcharge": surcharge,
             "s_rate": s_rate,
             "cess": cess,
-            "total_tax": tax_after_rebate + surcharge + cess
+            "rebate_adjustment": base_tax - tax_after_rebate
         }
-    
 
-# # --- INPUT SECTION ---
-# user_income = IncomeData(gross_salary=14500000, interest_income=15000)
-# user_deductions = DeductionsData(nps_corporate_80ccd2=50000)
+    def _calculate_slab_tax(self, income: float) -> float:
+        tax = 0.0
+        if income <= 400000: return 0.0
+        
+        for i, (limit, rate) in enumerate(self.slabs):
+            if income > limit:
+                next_limit = self.slabs[i+1][0] if i+1 < len(self.slabs) else float('inf')
+                taxable_in_slab = min(income, next_limit) - limit
+                tax += taxable_in_slab * rate
+            else:
+                break
+        return tax
 
-# # --- PROCESSING ---
-# total_gross = user_income.get_total_gross()
-# total_deductions = user_deductions.get_total_deductions()
-# net_taxable = max(0, total_gross - total_deductions)
+    def _apply_rebate(self, income: float, tax: float) -> float:
+        if income <= self.REBATE_THRESHOLD:
+            return 0.0
+        # Marginal Relief: Tax cannot exceed income above 12L
+        excess_income = income - self.REBATE_THRESHOLD
+        return min(tax, excess_income)
 
-# engine = TaxEngine2026()
-# results = engine.compute(net_taxable)
-
-# # --- BEAUTIFUL OUTPUT ---
-# summary_data = {
-#     "Description": [
-#         "Gross Total Income", 
-#         "Total Deductions", 
-#         "Net Taxable Income",
-#         "Slab Tax (Before Rebate)",
-#         "87A Rebate/Relief",
-#         "Surcharge",
-#         "Health & Education Cess (4%)",
-#         "TOTAL TAX PAYABLE"
-#     ],
-#     "Amount (₹)": [
-#         total_gross,
-#         -total_deductions,
-#         results['taxable_income'],
-#         results['base_tax'],
-#         -results['rebate_adjustment'],
-#         results['surcharge'],
-#         results['cess'],
-#         results['total_tax']
-#     ]
-# }
-
-# df = pd.DataFrame(summary_data)
-# # df.style.format({"Amount (₹)": "₹{:,.0f}"})
+    def _calculate_surcharge(self, income: float, tax: float):
+        if income <= 5000000: return 0.0, 0.0
+        if income <= 10000000: return tax * 0.10, 0.10
+        if income <= 20000000: return tax * 0.15, 0.15
+        return tax * 0.25, 0.25 # Capped at 25% for New Regime
