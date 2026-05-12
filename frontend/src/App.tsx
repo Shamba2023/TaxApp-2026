@@ -67,9 +67,9 @@ const TaxCalculatorUI = () => {
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">₹</span>
                   <input
                     type="number"
-                    value={formData[field.id]}
+                    value={formData[field.id as keyof typeof formData]}
                     onChange={(e) => setFormData({ ...formData, [field.id]: Number(e.target.value) })}
-                    className="w-auto min-w-full bg-[#0F172A] border border-slate-700 rounded-xl py-3 pl-8 pr-4 text-white focus:border-blue-500 transition-all outline-none font-semibold text-sm"
+                    className="w-full bg-[#0F172A] border border-slate-700 rounded-xl py-3 pl-8 pr-4 text-white focus:border-blue-500 transition-all outline-none font-semibold text-sm"
                   />
                 </div>
               </div>
@@ -116,15 +116,13 @@ const TaxCalculatorUI = () => {
                     ₹{Math.round(data.results?.total_tax).toLocaleString("en-IN")}
                   </h3>
                 </div>
-                <div className="flex gap-4">
-                  <div className="text-right">
-                    <p className="text-slate-500 text-[10px] font-bold uppercase">Effective Rate</p>
-                    <p className="text-lg font-bold">
-                      {data.summary?.net_taxable > 0 
-                        ? ((data.results.total_tax / data.summary.net_taxable) * 100).toFixed(2) 
-                        : 0}%
-                    </p>
-                  </div>
+                <div className="text-right">
+                  <p className="text-slate-500 text-[10px] font-bold uppercase">Effective Rate</p>
+                  <p className="text-lg font-bold">
+                    {data.summary?.net_taxable > 0 
+                      ? ((data.results.total_tax / data.summary.net_taxable) * 100).toFixed(2) 
+                      : 0}%
+                  </p>
                 </div>
               </div>
 
@@ -141,15 +139,15 @@ const TaxCalculatorUI = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       <tr>
-                        <td className="px-6 py-4 text-slate-600">I. Income from Salary (Net of Std. Deduction)</td>
-                        <td className="px-6 py-4 text-right font-semibold">₹{data.summary?.salary_net?.toLocaleString("en-IN") || "0"}</td>
+                        <td className="px-6 py-4 text-slate-600">I. Salary Income (Net)</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{data.summary?.salary_net?.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr>
-                        <td className="px-6 py-4 text-slate-600">II. Income from House Property (Net of 30% Deduction)</td>
-                        <td className="px-6 py-4 text-right font-semibold">₹{data.summary?.house_net?.toLocaleString("en-IN") || "0"}</td>
+                        <td className="px-6 py-4 text-slate-600">II. House Property Income (Net)</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{data.summary?.house_net?.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr>
-                        <td className="px-6 py-4 text-slate-600">III. Profits & Gains from Business/Profession</td>
+                        <td className="px-6 py-4 text-slate-600">III. Business/Profession Profits</td>
                         <td className="px-6 py-4 text-right font-semibold">₹{formData.business_income.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr>
@@ -157,7 +155,7 @@ const TaxCalculatorUI = () => {
                         <td className="px-6 py-4 text-right font-semibold">₹{formData.capital_gains.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr>
-                        <td className="px-6 py-4 text-slate-600">V. Income from Other Sources</td>
+                        <td className="px-6 py-4 text-slate-600">V. Other Sources</td>
                         <td className="px-6 py-4 text-right font-semibold">₹{formData.other_income.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr className="bg-blue-50/30">
@@ -165,7 +163,7 @@ const TaxCalculatorUI = () => {
                         <td className="px-6 py-4 text-right font-black text-blue-700">₹{data.summary?.total_gross_income?.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr>
-                        <td className="px-6 py-4 text-slate-500 italic">Less: Deductions under Chapter VI-A (NPS 80CCD2)</td>
+                        <td className="px-6 py-4 text-slate-500 italic">Less: NPS 80CCD2 Deduction</td>
                         <td className="px-6 py-4 text-right text-red-600">(-) ₹{data.summary?.nps_deduction?.toLocaleString("en-IN")}</td>
                       </tr>
                       <tr className="bg-slate-900 text-white">
@@ -177,42 +175,25 @@ const TaxCalculatorUI = () => {
                 </div>
               </div>
 
-              {/* Tax Component Breakdown */}
+              {/* 4-Column Tax Breakdown Line */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-  
-  {/* 1. Base Tax */}
-  <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
-    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Net Base Tax</p>
-    <p className="text-xl font-bold text-slate-800">
-      ₹{Math.round(data.results?.tax_after_rebate).toLocaleString("en-IN")}
-    </p>
-  </div>
-
-  {/* 2. Surcharge */}
-  <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
-    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-      Surcharge ({data.results?.s_rate * 100}%)
-    </p>
-    <p className="text-xl font-bold text-slate-800">
-      ₹{Math.round(data.results?.surcharge).toLocaleString("en-IN")}
-    </p>
-  </div>
-
-  {/* 3. Cess */}
-  <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
-    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Edu Cess (4%)</p>
-    <p className="text-xl font-bold text-slate-800">
-      ₹{Math.round(data.results?.cess).toLocaleString("en-IN")}
-    </p>
-  </div>
-
-  {/* 4. Total Tax (The New Summary Column) */}
-  <div className="p-5 border border-blue-100 rounded-2xl bg-blue-50/40 ring-1 ring-blue-200/50">
-    <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Total Tax Payable</p>
-    <p className="text-xl font-black text-blue-900">
-      ₹{Math.round(data.results?.total_tax).toLocaleString("en-IN")}
-    </p>
-  </div>
+                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Net Base Tax</p>
+                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.tax_after_rebate).toLocaleString("en-IN")}</p>
+                </div>
+                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Surcharge ({data.results?.s_rate * 100}%)</p>
+                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.surcharge).toLocaleString("en-IN")}</p>
+                </div>
+                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Edu Cess (4%)</p>
+                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.cess).toLocaleString("en-IN")}</p>
+                </div>
+                <div className="p-5 border border-blue-100 rounded-2xl bg-blue-50/40 ring-1 ring-blue-200/50">
+                  <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Total Tax Payable</p>
+                  <p className="text-xl font-black text-blue-900">₹{Math.round(data.results?.total_tax).toLocaleString("en-IN")}</p>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
@@ -220,10 +201,8 @@ const TaxCalculatorUI = () => {
                 <ShieldCheck className="w-8 h-8 text-slate-200" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-800">Financial Analysis Ready</h3>
-                <p className="text-slate-500 max-w-sm mx-auto text-sm mt-2">
-                  Enter your earnings across the five heads of income to generate a professional tax computation report.
-                </p>
+                <h3 className="text-xl font-bold text-slate-800">Tax Computation Ready</h3>
+                <p className="text-slate-500 max-w-sm mx-auto text-sm mt-2">Enter your earnings to generate a professional assessment report.</p>
               </div>
             </div>
           )}
