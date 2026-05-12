@@ -53,13 +53,15 @@ async def calculate_tax_api(data: TaxInputRequest):
         results = engine.compute_tax(gti, nps_80ccd2=data.nps_corporate)
 
         return {
-            "summary": {
-                "total_gross_income": gti,
-                "nps_deduction": data.nps_corporate,
-                "net_taxable": max(0, gti - data.nps_corporate)
-            },
-            "results": results
-        }
+    "summary": {
+        "salary_net": salary.compute(),      # Add this
+        "house_net": house.compute(),        # Add this
+        "total_gross_income": gti,
+        "nps_deduction": data.nps_corporate,
+        "net_taxable": max(0, gti - data.nps_corporate)
+    },
+    "results": results
+}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 # --- SERVING THE FRONTEND (REACT) ---
