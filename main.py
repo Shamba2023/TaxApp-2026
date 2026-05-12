@@ -36,43 +36,34 @@ class TaxInputRequest(BaseModel):
     nps_corporate: float = 0.0
 
 engine = TaxEngine2026()
-
+# Calculate_tax_api function
 @app.post("/calculate")
 async def calculate_tax_api(data: TaxInputRequest):
     try:
-        # 1. Instantiate the Heads of Income
+        # ... (previous logic for instantiating heads) ...
         salary = SalaryIncome(gross_salary=data.gross_salary)
         house = HousePropertyIncome(rental_income=data.rental_income)
         business = BusinessProfessionIncome(net_profit=data.business_income)
         capital = CapitalGainsIncome(stcg_taxable=data.capital_gains)
         others = OtherSourcesIncome(interest_income=data.other_income)
 
-        # 2. Compute Net for each head (applying their specific deductions)
-        salary_net = salary.compute()
-        house_net = house.compute()
-        business_net = business.compute()
-        capital_net = capital.compute()
-        others_net = others.compute()
-
-        # 3. Sum up for Gross Total Income
-        gti = salary_net + house_net + business_net + capital_net + others_net
-
-        # 4. Final calculation via Engine
+        gti = salary.compute() + house.compute() + business.compute() + capital.compute() + others.compute()
         results = engine.compute_tax(gti, nps_80ccd2=data.nps_corporate)
 
         return {
             "summary": {
-                "salary_net": salary_net,
-                "house_net": house_net,
+                "salary_net": salary.compute(),
+                "house_net": house.compute(),
                 "total_gross_income": gti,
                 "nps_deduction": data.nps_corporate,
                 "net_taxable": max(0, gti - data.nps_corporate)
             },
-            "results": results
+            "results": {
+                **results,
+                "tax_after_rebate": results.get("base_tax") - results.get("rebate_adjustment")
+            }
         }
     except Exception as e:
-        # This will show you the exact error in Render logs if it fails again
-        print(f"Error during calculation: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # --- SERVING THE FRONTEND ---
