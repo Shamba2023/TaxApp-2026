@@ -32,31 +32,36 @@ engine = TaxEngine2026()
 @app.post("/calculate")
 async def calculate_tax_api(data: TaxInputRequest):
     try:
-        income = IncomeData(
-            gross_salary=data.gross_salary,
-            interest_income=data.interest_income,
-            rental_income=data.rental_income,
-            other_income=data.other_income
+        # Instantiate Income Heads
+        salary = SalaryIncome(gross_salary=data.gross_salary)
+        house = HousePropertyIncome(rental_income=data.rental_income)
+        others = OtherSourcesIncome(interest_income=data.interest_income)
+        # Placeholder for future inputs:
+        business = BusinessProfessionIncome()
+        capital_gains = CapitalGainsIncome()
+
+        # Gross Total Income (Sum of all 5 Heads)
+        gti = (
+            salary.compute() + 
+            house.compute() + 
+            business.compute() + 
+            capital_gains.compute() + 
+            others.compute()
         )
-        deductions = DeductionsData(nps_corporate_80ccd2=data.nps_corporate)
 
-        total_gross = income.get_total_gross()
-        total_deductions = deductions.get_total_deductions()
-        net_taxable = max(0, total_gross - total_deductions)
-
-        results = engine.compute(net_taxable)
+        # Calculate using the engine
+        results = engine.compute_tax(gti, nps_80ccd2=data.nps_corporate)
 
         return {
             "summary": {
-                "total_gross": total_gross,
-                "total_deductions": total_deductions,
-                "net_taxable": net_taxable
+                "total_gross_income": gti,
+                "nps_deduction": data.nps_corporate,
+                "net_taxable": max(0, gti - data.nps_corporate)
             },
             "results": results
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 # --- SERVING THE FRONTEND (REACT) ---
 # We use absolute paths to ensure Render finds the files
 base_dir = os.path.dirname(os.path.abspath(__file__))
