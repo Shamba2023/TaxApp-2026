@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { IndianRupee, ShieldCheck, ChevronRight, Calculator, PieChart, TrendingDown, Info, Wallet } from "lucide-react";
+import { 
+  IndianRupee, ShieldCheck, ChevronRight, Calculator, 
+  Briefcase, Home, Activity, TrendingUp, Coins, FileText, Info 
+} from "lucide-react";
 
 const TaxCalculatorUI = () => {
   const [formData, setFormData] = useState({
     gross_salary: 1500000,
-    interest_income: 0,
     rental_income: 0,
+    business_income: 0,
+    capital_gains: 0,
     other_income: 0,
     nps_corporate: 0,
   });
@@ -16,71 +20,68 @@ const TaxCalculatorUI = () => {
   const handleCalculate = async () => {
     setLoading(true);
     try {
-      const payload = {
-        gross_salary: Number(formData.gross_salary) || 0,
-        interest_income: Number(formData.interest_income) || 0,
-        rental_income: Number(formData.rental_income) || 0,
-        other_income: Number(formData.other_income) || 0,
-        nps_corporate: Number(formData.nps_corporate) || 0,
-      };
-
       const resp = await fetch("/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(formData),
       });
       const result = await resp.json();
       setData(result);
     } catch (err) {
-      console.error(err);
+      console.error("Calculation Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  const incomeFields = [
+    { id: "gross_salary", label: "Salary Income", icon: <Briefcase className="w-4 h-4" /> },
+    { id: "rental_income", label: "House Property (Rent)", icon: <Home className="w-4 h-4" /> },
+    { id: "business_income", label: "Business/Profession", icon: <Activity className="w-4 h-4" /> },
+    { id: "capital_gains", label: "Capital Gains", icon: <TrendingUp className="w-4 h-4" /> },
+    { id: "other_income", label: "Other Sources", icon: <Coins className="w-4 h-4" /> },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F0F2F5] flex items-center justify-center p-4 lg:p-8 font-sans">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[32px] overflow-hidden min-h-[750px]">
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row shadow-[0_20px_50px_rgba(0,0,0,0.15)] rounded-[32px] overflow-hidden bg-white">
         
-        {/* LEFT PANEL: Deep Professional Command Center */}
-        <div className="lg:w-[42%] bg-[#1E293B] p-8 lg:p-12 text-white flex flex-col">
-          <div className="flex items-center gap-3 mb-10">
+        {/* LEFT PANEL: Inputs */}
+        <div className="lg:w-[35%] bg-[#1E293B] p-8 text-white flex flex-col border-r border-slate-700">
+          <div className="flex items-center gap-3 mb-8">
             <div className="bg-blue-600 p-2 rounded-xl">
               <Calculator className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">Tax Sage <span className="text-blue-400">2026</span></h1>
+            <h1 className="text-xl font-bold tracking-tight">WealthSuite <span className="text-blue-400 text-sm">Pro</span></h1>
           </div>
 
-          <div className="space-y-6 flex-1">
-            <p className="text-slate-400 text-sm font-medium uppercase tracking-widest mb-4">Income Parameters</p>
+          <div className="space-y-5 flex-1 overflow-y-auto pr-2">
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Five Heads of Income</p>
             
-            {[
-              { id: "gross_salary", label: "Annual Salary", icon: "💼" },
-              { id: "interest_income", label: "Investment Interest", icon: "📈" },
-              { id: "rental_income", label: "Rental Earnings", icon: "🏠" },
-              { id: "other_income", label: "Miscellaneous", icon: "✨" },
-            ].map((field) => (
-              <div key={field.id} className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 ml-1 italic">{field.label}</label>
+            {incomeFields.map((field) => (
+              <div key={field.id} className="space-y-1">
+                <label className="text-[11px] font-bold text-slate-400 flex items-center gap-2">
+                  {field.icon} {field.label}
+                </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₹</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-xs">₹</span>
                   <input
                     type="number"
                     value={formData[field.id]}
-                    onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
-                    className="w-full bg-[#0F172A] border border-slate-700 rounded-2xl py-4 pl-10 pr-4 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all outline-none font-semibold"
+                    onChange={(e) => setFormData({ ...formData, [field.id]: Number(e.target.value) })}
+                    className="w-auto min-w-full bg-[#0F172A] border border-slate-700 rounded-xl py-3 pl-8 pr-4 text-white focus:border-blue-500 transition-all outline-none font-semibold text-sm"
                   />
                 </div>
               </div>
             ))}
 
-            <div className="pt-6 mt-6 border-t border-slate-700/50">
-              <label className="text-xs font-bold text-blue-400 ml-1">NPS CORPORATE (80CCD2)</label>
+            <div className="pt-4 mt-4 border-t border-slate-700/50">
+              <label className="text-[11px] font-black text-indigo-400 uppercase tracking-widest">NPS Corporate (Sec 80CCD2)</label>
               <input
                 type="number"
                 value={formData.nps_corporate}
-                onChange={(e) => setFormData({ ...formData, nps_corporate: e.target.value })}
-                className="w-full bg-[#0F172A] border border-blue-900/30 rounded-2xl py-4 px-6 mt-2 text-white focus:border-blue-500 outline-none font-semibold"
+                onChange={(e) => setFormData({ ...formData, nps_corporate: Number(e.target.value) })}
+                className="w-full bg-[#0F172A] border border-indigo-900/30 rounded-xl py-3 px-4 mt-2 text-white focus:border-blue-500 outline-none font-semibold text-sm"
               />
             </div>
           </div>
@@ -88,80 +89,121 @@ const TaxCalculatorUI = () => {
           <button
             onClick={handleCalculate}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black text-lg mt-10 transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98]"
+            className="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-sm mt-8 transition-all shadow-lg active:scale-[0.98]"
           >
-            {loading ? "CALCULATING..." : "GENERATE REPORT"}
+            {loading ? "GENERATING..." : "COMPUTE TAXATION"}
           </button>
         </div>
 
-        {/* RIGHT PANEL: Soothing Results Display */}
-        <div className="flex-1 bg-white p-8 lg:p-12 flex flex-col justify-center">
+        {/* RIGHT PANEL: Detailed Results */}
+        <div className="flex-1 bg-white p-8 lg:p-12 overflow-y-auto">
           {data ? (
-            <div className="animate-in fade-in slide-in-from-right-8 duration-500">
-              <header className="mb-10 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-tighter mb-4">
-                  <ShieldCheck className="w-4 h-4" /> Final Assessment AY 2026-27
+            <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+              <div className="flex justify-between items-start mb-8">
+                <h2 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+                  <FileText className="w-8 h-8 text-blue-600" /> Computation Table
+                </h2>
+                <div className="bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+                  AY 2026-27 (New Regime)
                 </div>
-                <h2 className="text-4xl font-black text-slate-800 tracking-tight">Tax Report Summary</h2>
-              </header>
+              </div>
 
-              <div className="grid gap-6">
-                {/* Main Tax Card */}
-                <div className="bg-[#F8FAFC] border border-slate-200 p-8 rounded-[28px] relative overflow-hidden group hover:border-blue-200 transition-colors">
-                  <div className="relative z-10">
-                    <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Total Tax Liability</p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-light text-slate-400">₹</span>
-                      <h3 className="text-7xl font-black text-slate-900 tracking-tighter">
-                        {Math.round(data.results?.total_tax).toLocaleString("en-IN")}
-                      </h3>
-                    </div>
-                  </div>
-                  <Wallet className="absolute -right-4 -bottom-4 w-32 h-32 text-slate-100 group-hover:text-blue-50 transition-colors" />
+              {/* High-level Tax Summary Card */}
+              <div className="bg-[#1E293B] rounded-[24px] p-8 text-white mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Final Net Tax Liability</p>
+                  <h3 className="text-5xl font-black text-white tracking-tighter">
+                    ₹{Math.round(data.results?.total_tax).toLocaleString("en-IN")}
+                  </h3>
                 </div>
-
-                {/* Sub-details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Taxable Income</p>
-                      <p className="text-xl font-extrabold text-slate-700">₹{data.summary?.net_taxable.toLocaleString("en-IN")}</p>
-                    </div>
-                    <PieChart className="w-6 h-6 text-slate-300" />
-                  </div>
-                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex justify-between items-center">
-                    <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Effective Rate</p>
-                      <p className="text-xl font-extrabold text-slate-700">
-                        {data.summary?.net_taxable > 0 
-                          ? ((data.results.total_tax / data.summary.net_taxable) * 100).toFixed(1) 
-                          : 0}%
-                      </p>
-                    </div>
-                    <TrendingDown className="w-6 h-6 text-slate-300" />
+                <div className="flex gap-4">
+                  <div className="text-right">
+                    <p className="text-slate-500 text-[10px] font-bold uppercase">Effective Rate</p>
+                    <p className="text-lg font-bold">
+                      {data.summary?.net_taxable > 0 
+                        ? ((data.results.total_tax / data.summary.net_taxable) * 100).toFixed(2) 
+                        : 0}%
+                    </p>
                   </div>
                 </div>
+              </div>
 
-                {/* Status Bar */}
-                <div className="mt-4 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 flex items-center gap-4">
-                  <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
-                    <Info className="w-5 h-5 text-blue-500" />
-                  </div>
-                  <p className="text-sm text-slate-600 font-medium">
-                    Calculation includes <span className="text-blue-700 font-bold">Standard Deduction (₹75k)</span> and applicable Section 87A rebates.
-                  </p>
+              {/* Detailed Breakdown Table */}
+              <div className="space-y-1 mb-8">
+                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-3">Computation of Total Income</p>
+                <div className="border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                  <table className="w-full text-left text-sm border-collapse">
+                    <thead className="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase">
+                      <tr>
+                        <th className="px-6 py-4">Income Head / Description</th>
+                        <th className="px-6 py-4 text-right">Amount (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      <tr>
+                        <td className="px-6 py-4 text-slate-600">I. Income from Salary (Net of Std. Deduction)</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{data.summary?.salary_net?.toLocaleString("en-IN") || "0"}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-slate-600">II. Income from House Property (Net of 30% Deduction)</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{data.summary?.house_net?.toLocaleString("en-IN") || "0"}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-slate-600">III. Profits & Gains from Business/Profession</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{formData.business_income.toLocaleString("en-IN")}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-slate-600">IV. Capital Gains</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{formData.capital_gains.toLocaleString("en-IN")}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-slate-600">V. Income from Other Sources</td>
+                        <td className="px-6 py-4 text-right font-semibold">₹{formData.other_income.toLocaleString("en-IN")}</td>
+                      </tr>
+                      <tr className="bg-blue-50/30">
+                        <td className="px-6 py-4 font-bold text-slate-800 uppercase text-xs">Gross Total Income (GTI)</td>
+                        <td className="px-6 py-4 text-right font-black text-blue-700">₹{data.summary?.total_gross_income?.toLocaleString("en-IN")}</td>
+                      </tr>
+                      <tr>
+                        <td className="px-6 py-4 text-slate-500 italic">Less: Deductions under Chapter VI-A (NPS 80CCD2)</td>
+                        <td className="px-6 py-4 text-right text-red-600">(-) ₹{data.summary?.nps_deduction?.toLocaleString("en-IN")}</td>
+                      </tr>
+                      <tr className="bg-slate-900 text-white">
+                        <td className="px-6 py-4 font-bold uppercase text-xs tracking-widest">Net Taxable Income</td>
+                        <td className="px-6 py-4 text-right font-black">₹{data.summary?.net_taxable?.toLocaleString("en-IN")}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Tax Component Breakdown */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Income Tax (Base)</p>
+                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.base_tax).toLocaleString("en-IN")}</p>
+                </div>
+                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Surcharge ({data.results?.s_rate * 100}%)</p>
+                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.surcharge).toLocaleString("en-IN")}</p>
+                </div>
+                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Health & Edu Cess (4%)</p>
+                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.cess).toLocaleString("en-IN")}</p>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="text-center space-y-6">
-              <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-300">
-                <IndianRupee className="w-10 h-10 text-slate-200" />
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
+              <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center border border-dashed border-slate-300">
+                <ShieldCheck className="w-8 h-8 text-slate-200" />
               </div>
-              <h3 className="text-2xl font-black text-slate-800">Ready for Analysis?</h3>
-              <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">
-                Enter your income data in the left panel to generate your 2026-27 comprehensive tax breakdown.
-              </p>
+              <div>
+                <h3 className="text-xl font-bold text-slate-800">Financial Analysis Ready</h3>
+                <p className="text-slate-500 max-w-sm mx-auto text-sm mt-2">
+                  Enter your earnings across the five heads of income to generate a professional tax computation report.
+                </p>
+              </div>
             </div>
           )}
         </div>
