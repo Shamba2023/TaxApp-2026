@@ -178,20 +178,41 @@ const TaxCalculatorUI = () => {
               </div>
 
               {/* Tax Component Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Income Tax (Base)</p>
-                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.base_tax).toLocaleString("en-IN")}</p>
-                </div>
-                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Surcharge ({data.results?.s_rate * 100}%)</p>
-                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.surcharge).toLocaleString("en-IN")}</p>
-                </div>
-                <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Health & Edu Cess (4%)</p>
-                  <p className="text-xl font-bold text-slate-800">₹{Math.round(data.results?.cess).toLocaleString("en-IN")}</p>
-                </div>
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+  
+  {/* 1. Base Tax */}
+  <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Net Base Tax</p>
+    <p className="text-xl font-bold text-slate-800">
+      ₹{Math.round(data.results?.tax_after_rebate).toLocaleString("en-IN")}
+    </p>
+  </div>
+
+  {/* 2. Surcharge */}
+  <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+      Surcharge ({data.results?.s_rate * 100}%)
+    </p>
+    <p className="text-xl font-bold text-slate-800">
+      ₹{Math.round(data.results?.surcharge).toLocaleString("en-IN")}
+    </p>
+  </div>
+
+  {/* 3. Cess */}
+  <div className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50">
+    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Edu Cess (4%)</p>
+    <p className="text-xl font-bold text-slate-800">
+      ₹{Math.round(data.results?.cess).toLocaleString("en-IN")}
+    </p>
+  </div>
+
+  {/* 4. Total Tax (The New Summary Column) */}
+  <div className="p-5 border border-blue-100 rounded-2xl bg-blue-50/40 ring-1 ring-blue-200/50">
+    <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">Total Tax Payable</p>
+    <p className="text-xl font-black text-blue-900">
+      ₹{Math.round(data.results?.total_tax).toLocaleString("en-IN")}
+    </p>
+  </div>
             </div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
